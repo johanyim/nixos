@@ -56,13 +56,13 @@
 		};
 	};
 
-home-manager = {
-extraSpecialArgs = {inherit inputs; };
-users = {
-"johan" = import ./home.nix;
-};
+	home-manager = {
+		extraSpecialArgs = {inherit inputs; };
+		users = {
+			"johan" = import ./home.nix;
+		};
 
-};
+	};
 
 	nixpkgs.config.allowUnfree = true;
 
