@@ -1,37 +1,29 @@
 {
-	description = "first flake";
+	description = "A very basic flake";
 
 	inputs = {
 		nixpkgs.url = "github:nixos/nixpkgs/nixos-23.11";
+		nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
-		home-manager = {
-			url = "github:nix-community/home-manager/release-23.11";
-			# nixpkgs and home manager are synchronised
-			inputs.nixpkgs.follows = "nixpkgs";
-		};
+		# reduce desk space usage by inheriting a previous channel
+		home-manager.url = "github:nix-community/home-manager/release-23.11";
+		home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-		xremap-flake.url = "github:xremap/nix-flake";
 	};
 
-	outputs = { self, nixpkgs, home-manager, ... }@inputs: 
-	let 
-		system = "x86_64-linux";
-	in {
-		nixosConfigurations.testpad = nixpkgs.lib.nixosSystem {
-			inherit system;
-			specialArgs = { inherit inputs; }; # allow 'inputs' variable to be used as an arg in all modules
-			modules = [ ./hosts/default/configuration.nix ];
-		};
 
-		nixosConfigurations.thinkpad = nixpkgs.lib.nixosSystem {
-			inherit system;
-			specialArgs = { inherit inputs; };
-			modules = [ ./hosts/default/configuration.nix ];
-		};
 
-		homeConfigurations.johan = home-manager.lib.homeManagerConfiguration {
-			pkgs = nixpkgs.legacyPackages.${system};
-			modules = [ ./home.nix ];
+	# the most used packages can be in the braces, also inputs are available to the block beneath
+	outputs = { self, nixpkgs, home-manager, ... } @ inputs: 
+	{
+		nixosConfigurations = {
+			default = nixpkgs.lib.nixosSystem {
+				specialArgs = { inherit inputs; };
+				modules = [
+					./hosts/default/configuration.nix
+					inputs.home-manager.nixosModules.default
+				];
+			};
 		};
 	};
 }
