@@ -8,7 +8,7 @@
 		aliases = {
 			s = "status";
 		};
-		config = {
+		extraConfig = {
 			core = {
 				editor = "vim";
 			};
